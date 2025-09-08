@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmmaker's Creative Studio - Game for Vikrant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .studio-panel {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .panel-title {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .tool-btn {
+            padding: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .tool-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-btn.selected {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            transform: scale(1.05);
+        }
+
+        .project-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .score-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .score {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .create-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-item {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #ffd700;
+        }
+
+        .achievement {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            to { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+        }
+
+        .film-strip {
+            background: repeating-linear-gradient(
+                90deg,
+                #333,
+                #333 20px,
+                #666 20px,
+                #666 40px
+            );
+            height: 40px;
+            border-radius: 5px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .film-strip::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            right: 10px;
+            bottom: 5px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255,255,255,0.1) 50%, 
+                transparent 100%);
+            animation: film-roll 3s linear infinite;
+        }
+
+        @keyframes film-roll {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🎬 Filmmaker's Creative Studio 🎨</h1>
+            <p>A personalized game for Vikrant - Master of Film & Design!</p>
+            <div class="film-strip"></div>
+        </div>
+
+        <div class="game-area">
+            <div class="studio-panel">
+                <h3 class="panel-title">🎥 Film Equipment</h3>
+                <div class="tool-grid">
+                    <button class="tool-btn" data-tool="camera" data-category="film">📷 Camera</button>
+                    <button class="tool-btn" data-tool="lights" data-category="film">💡 Lighting</button>
+                    <button class="tool-btn" data-tool="microphone" data-category="film">🎤 Audio</button>
+                    <button class="tool-btn" data-tool="tripod" data-category="film">📐 Tripod</button>
+                    <button class="tool-btn" data-tool="drone" data-category="film">🚁 Drone</button>
+                    <button class="tool-btn" data-tool="lens" data-category="film">🔍 Lens Kit</button>
+                </div>
+                <button class="create-btn" onclick="createProject('film')">Create Film Project</button>
+            </div>
+
+            <div class="studio-panel">
+                <h3 class="panel-title">🎨 Design Tools</h3>
+                <div class="tool-grid">
+                    <button class="tool-btn" data-tool="photoshop" data-category="design">🖼️ Photoshop</button>
+                    <button class="tool-btn" data-tool="figma" data-category="design">📱 Figma</button>
+                    <button class="tool-btn" data-tool="illustrator" data-category="design">✏️ Illustrator</button>
+                    <button class="tool-btn" data-tool="aftereffects" data-category="design">⚡ After Effects</button>
+                    <button class="tool-btn" data-tool="blender" data-category="design">🎭 Blender 3D</button>
+                    <button class="tool-btn" data-tool="sketch" data-category="design">📝 Sketch</button>
+                </div>
+                <button class="create-btn" onclick="createProject('design')">Create Design Project</button>
+            </div>
+        </div>
+
+        <div class="studio-panel">
+            <h3 class="panel-title">🚀 Your Creative Portfolio</h3>
+            <div class="project-display" id="projectDisplay">
+                <p>Select your tools and start creating! 🎯</p>
+                <p style="opacity: 0.7; margin-top: 10px;">Mix film equipment and design tools for unique projects!</p>
+            </div>
+        </div>
+
+        <div class="score-panel">
+            <div class="score">Creative Score: <span id="score">0</span> 🌟</div>
+            <div id="achievements"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTools = [];
+        let score = 0;
+        let projects = [];
+        let achievements = [];
+
+        // Tool combinations and their project results
+        const projectCombinations = {
+            // Film projects
+            'camera-lights-microphone': { 
+                name: 'Documentary Film', 
+                score: 50, 
+                emoji: '🎬',
+                description: 'A compelling documentary with great audio-visual quality'
+            },
+            'camera-drone-lens': { 
+                name: 'Cinematic Short Film', 
+                score: 60, 
+                emoji: '🎭',
+                description: 'Stunning aerial shots with professional cinematography'
+            },
+            'camera-tripod-lights': { 
+                name: 'Interview Series', 
+                score: 45, 
+                emoji: '📺',
+                description: 'Professional interview setup with perfect lighting'
+            },
+
+            // Design projects
+            'photoshop-illustrator-figma': { 
+                name: 'Brand Identity Package', 
+                score: 55, 
+                emoji: '🎨',
+                description: 'Complete visual identity with logos and guidelines'
+            },
+            'aftereffects-blender-photoshop': { 
+                name: '3D Motion Graphics', 
+                score: 70, 
+                emoji: '✨',
+                description: 'Complex 3D animations with stunning visual effects'
+            },
+            'figma-sketch-illustrator': { 
+                name: 'UI/UX Design System', 
+                score: 65, 
+                emoji: '📱',
+                description: 'Comprehensive digital design system'
+            },
+
+            // Hybrid projects (Film + Design)
+            'camera-aftereffects-photoshop': { 
+                name: 'VFX Short Film', 
+                score: 80, 
+                emoji: '🎆',
+                description: 'Film with stunning visual effects and post-production'
+            },
+            'drone-blender-aftereffects': { 
+                name: 'Architectural Visualization', 
+                score: 75, 
+                emoji: '🏗️',
+                description: 'Drone footage enhanced with 3D modeling and effects'
+            },
+            'microphone-figma-illustrator': { 
+                name: 'Podcast Brand Design', 
+                score: 50, 
+                emoji: '🎙️',
+                description: 'Audio content with complete visual branding'
+            },
+
+            // Special MuseYard-inspired combinations
+            'figma-camera-aftereffects': { 
+                name: 'MuseYard Promo Video', 
+                score: 85, 
+                emoji: '🎪',
+                description: 'No-code platform showcase with sleek design and video'
+            },
+            'photoshop-drone-blender': { 
+                name: 'Creative Studio Showcase', 
+                score: 90, 
+                emoji: '🌟',
+                description: 'Ultimate creative portfolio piece combining all skills'
+            }
+        };
+
+        // Achievement triggers
+        const achievementTriggers = {
+            firstProject: { name: 'First Creation! 🎉', desc: 'Created your first project' },
+            filmMaster: { name: 'Film Master 🎬', desc: 'Created 3 film projects' },
+            designGuru: { name: 'Design Guru 🎨', desc: 'Created 3 design projects' },
+            hybridCreator: { name: 'Hybrid Creator 🔥', desc: 'Mixed film and design tools' },
+            museYardSpecial: { name: 'MuseYard Visionary 🎪', desc: 'Created the MuseYard special project' },
+            scoreHunter: { name: 'Score Hunter ⭐', desc: 'Reached 200 points' },
+            toolCollector: { name: 'Tool Collector 🛠️', desc: 'Used all tools at least once' }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click listeners to all tool buttons
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    toggleTool(this.dataset.tool, this);
+                });
+            });
+        });
+
+        function toggleTool(tool, button) {
+            if (selectedTools.includes(tool)) {
+                selectedTools = selectedTools.filter(t => t !== tool);
+                button.classList.remove('selected');
+            } else {
+                selectedTools.push(tool);
+                button.classList.add('selected');
+            }
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('projectDisplay');
+            if (selectedTools.length === 0) {
+                display.innerHTML = `
+                    <p>Select your tools and start creating! 🎯</p>
+                    <p style="opacity: 0.7; margin-top: 10px;">Mix film equipment and design tools for unique projects!</p>
+                `;
+            } else {
+                display.innerHTML = `
+                    <p><strong>Selected Tools:</strong></p>
+                    <p>${selectedTools.map(tool => getToolEmoji(tool) + ' ' + tool.charAt(0).toUpperCase() + tool.slice(1)).join(', ')}</p>
+                    <p style="margin-top: 15px; opacity: 0.8;">Ready to create something amazing!</p>
+                `;
+            }
+        }
+
+        function getToolEmoji(tool) {
+            const emojis = {
+                camera: '📷', lights: '💡', microphone: '🎤', tripod: '📐', drone: '🚁', lens: '🔍',
+                photoshop: '🖼️', figma: '📱', illustrator: '✏️', aftereffects: '⚡', blender: '🎭', sketch: '📝'
+            };
+            return emojis[tool] || '🔧';
+        }
+
+        function createProject(category) {
+            if (selectedTools.length < 2) {
+                alert('Select at least 2 tools to create a project! 🎯');
+                return;
+            }
+
+            // Find matching project combination
+            const toolKey = selectedTools.slice().sort().join('-');
+            let project = projectCombinations[toolKey];
+
+            if (!project) {
+                // Create a generic project based on category and number of tools
+                project = createGenericProject(category, selectedTools.length);
+            }
+
+            // Add project to portfolio
+            projects.push(project);
+            score += project.score;
+
+            // Update display
+            updateProjectDisplay();
+            updateScore();
+            checkAchievements();
+
+            // Clear selected tools
+            selectedTools = [];
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            updateDisplay();
+
+            // Show success message
+            showProjectCreated(project);
+        }
+
+        function createGenericProject(category, toolCount) {
+            const filmProjects = [
+                { name: 'Experimental Film', emoji: '🎪', description: 'Creative experimental project' },
+                { name: 'Music Video', emoji: '🎵', description: 'Artistic music video production' },
+                { name: 'Commercial Spot', emoji: '📺', description: 'Professional commercial production' }
+            ];
+
+            const designProjects = [
+                { name: 'Creative Portfolio', emoji: '🎨', description: 'Stunning design portfolio' },
+                { name: 'Digital Campaign', emoji: '🚀', description: 'Multi-platform design campaign' },
+                { name: 'Interactive Experience', emoji: '💫', description: 'Engaging interactive design' }
+            ];
+
+            const projects = category === 'film' ? filmProjects : designProjects;
+            const randomProject = projects[Math.floor(Math.random() * projects.length)];
+
+            return {
+                name: randomProject.name,
+                score: Math.min(toolCount * 15, 40),
+                emoji: randomProject.emoji,
+                description: randomProject.description
+            };
+        }
+
+        function updateProjectDisplay() {
+            const display = document.getElementById('projectDisplay');
+            if (projects.length === 0) {
+                display.innerHTML = `
+                    <p>Select your tools and start creating! 🎯</p>
+                    <p style="opacity: 0.7; margin-top: 10px;">Mix film equipment and design tools for unique projects!</p>
+                `;
+            } else {
+                display.innerHTML = `
+                    <h4>Portfolio Projects (${projects.length})</h4>
+                    ${projects.slice(-3).map(project => `
+                        <div class="project-item">
+                            <strong>${project.emoji} ${project.name}</strong><br>
+                            <small>${project.description} (+${project.score} pts)</small>
+                        </div>
+                    `).join('')}
+                    ${projects.length > 3 ? '<p style="opacity: 0.7; margin-top: 10px;">...and more!</p>' : ''}
+                `;
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+
+        function checkAchievements() {
+            // First project achievement
+            if (projects.length === 1 && !achievements.includes('firstProject')) {
+                addAchievement('firstProject');
+            }
+
+            // Film master achievement
+            const filmProjects = projects.filter(p => 
+                p.name.includes('Film') || p.name.includes('Documentary') || p.name.includes('Interview')
+            );
+            if (filmProjects.length >= 3 && !achievements.includes('filmMaster')) {
+                addAchievement('filmMaster');
+            }
+
+            // Design guru achievement
+            const designProjects = projects.filter(p => 
+                p.name.includes('Design') || p.name.includes('Brand') || p.name.includes('UI/UX')
+            );
+            if (designProjects.length >= 3 && !achievements.includes('designGuru')) {
+                addAchievement('designGuru');
+            }
+
+            // MuseYard special achievement
+            if (projects.some(p => p.name.includes('MuseYard')) && !achievements.includes('museYardSpecial')) {
+                addAchievement('museYardSpecial');
+            }
+
+            // Score hunter achievement
+            if (score >= 200 && !achievements.includes('scoreHunter')) {
+                addAchievement('scoreHunter');
+            }
+        }
+
+        function addAchievement(achievementKey) {
+            achievements.push(achievementKey);
+            const achievement = achievementTriggers[achievementKey];
+            const achievementsDiv = document.getElementById('achievements');
+            achievementsDiv.innerHTML += `
+                <div class="achievement">
+                    🏆 ${achievement.name}: ${achievement.desc}
+                </div>
+            `;
+        }
+
+        function showProjectCreated(project) {
+            const message = `🎉 Created: ${project.emoji} ${project.name}\n${project.description}\n+${project.score} points!`;
+            setTimeout(() => alert(message), 100);
+        }
+    </script>
+</body>
+</html>
